@@ -42,8 +42,8 @@ vector<Shoot> shoots;
 void printscreen(Robot &robot, Robot &robot2)
 {
     system("clear");
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 40; j++) {
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 20; j++) {
             if (j >= robot.x1 && j <= robot.x2 && i >= robot.y1 && i <= robot.y2)
                 cout << "X";
             else if (j >= robot2.x1 && j <= robot2.x2 && i >= robot2.y1 && i <= robot2.y2)
@@ -60,17 +60,27 @@ void printscreen(Robot &robot, Robot &robot2)
                 if (!flag) cout << "_";
             }
         }
-        cout << endl;
+        cout << "|" << endl;
     }
-    cout << "LIFE ROBOT 1: " << robot.hp << endl;
-    cout << "LIFE ROBOT 2: " << robot2.hp << endl;
+    cout << "HP BOT 1: ";
+    for (int i = 0; i < robot.hp; i++)
+        cout << "#";
+    for (int i = 0; i < (10 - robot.hp); i++)
+        cout << " ";
+    cout << "|" << endl;
+    cout << "HP BOT 2: ";
+    for (int i = 0; i < robot2.hp; i++)
+        cout << "#";
+    for (int i = 0; i < (10 - robot2.hp); i++)
+        cout << " ";
+    cout << "|" << endl;
 }
 
 int main()
 {
     srand(time(0));
     Robot robot(10, 0, 0, 1, 1);
-    Robot robot2(10, 38, 38, 39, 39);
+    Robot robot2(10, 18, 18, 19, 19);
 
     string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
 
@@ -78,7 +88,34 @@ int main()
 
     string c;
     while (true) {
-        usleep(100000);
+        usleep(50000);
+
+        for (auto it = shoots.begin(); it != shoots.end(); ) {
+            if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
+                robot.hp--;
+                it = shoots.erase(it);
+                continue;
+            }
+
+            if ((robot2.x1 <= (*it).x && (*it).x <= robot2.x2) && (robot2.y1 <= (*it).y && (*it).y <= robot2.y2)) {
+                robot2.hp--;
+                it = shoots.erase(it);
+                continue;
+            }
+
+            ++it;
+        }
+
+        if (robot.hp == 0) {
+            cout << "ROBOT 2 WINS!!!" << endl;
+            break;
+        }
+
+        if (robot2.hp == 0) {
+            cout << "ROBOT 1 WINS!!!" << endl;
+            break;
+        }
+
 
         printscreen(robot, robot2);
 
@@ -94,7 +131,7 @@ int main()
             }
         }
         else if (c == "d") {
-            if (r.x2 < 39) {
+            if (r.x2 < 19) {
                 r.x1++;
                 r.x2++;
             }
@@ -106,16 +143,16 @@ int main()
             }
         }
         else if (c == "s") {
-            if (r.y2 < 39) {
+            if (r.y2 < 19) {
                 r.y1++;
                 r.y2++;
             }
         }
         else if (c == "f1") { // esq
-            shoots.push_back(Shoot(r.x2 + 1, r.y1, 0));
+            shoots.push_back(Shoot(r.x1 - 1, r.y1, 0));
         }
         else if (c == "f2") { // dir
-            shoots.push_back(Shoot(r.x1 - 1, r.y1, 1));
+            shoots.push_back(Shoot(r.x2 + 1, r.y1, 1));
         }
         else if (c == "f3") { // cima
             shoots.push_back(Shoot(r.x1, r.y1 - 1, 2));
@@ -134,7 +171,7 @@ int main()
                 }
             }
             else if (s.dir == 1) {
-                if (s.x < 39)
+                if (s.x < 19)
                     s.x++;
                 else {
                     s.x = -1;
@@ -150,7 +187,7 @@ int main()
                 }
             }
             else if (s.dir == 3) {
-                if (s.y < 39)
+                if (s.y < 19)
                     s.y++;
                 else {
                     s.x = -1;
