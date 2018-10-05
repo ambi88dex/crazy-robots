@@ -80,7 +80,7 @@ void printscreen(Robot &robot, Robot &robot2)
     cout << "|" << endl;
 }
 
-void robot_movements(string& c,string acts[], Robot& r)
+void robot_movements(string &c, string acts[], Robot& r)
 {
     fp << "inside robot_movements BEGINS" << endl;
     c = acts[rand() % 8];
@@ -131,10 +131,7 @@ int main()
 
     string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
 
-    bool run = false;
-
     fp.open("log_file.txt");
-    string c;
     while (true) {
         usleep(50000);
 
@@ -166,13 +163,13 @@ int main()
 
 
         printscreen(robot, robot2);
-
-        Robot &r = run ? robot : robot2;
-        thread th(robot_movements,ref(c),acts,ref(r));
+        string c;
+        thread th(robot_movements, ref(c), acts, ref(robot));
+        thread th2(robot_movements, ref(c), acts, ref(robot2));
         fp << "outside robot_movements" << endl;
-        run = !run;
         fp << "outside robot_movements" << endl;
         th.join();
+        th2.join();
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
                 if (s.x > 0)
