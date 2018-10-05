@@ -2,6 +2,8 @@
 #include <vector>
 #include <cstdlib>
 #include <unistd.h>
+#include <thread>
+#include <fstream>
 
 using namespace std;
 
@@ -38,6 +40,8 @@ struct Shoot
 };
 
 vector<Shoot> shoots;
+
+ofstream fp;
 
 void printscreen(Robot &robot, Robot &robot2)
 {
@@ -76,6 +80,49 @@ void printscreen(Robot &robot, Robot &robot2)
     cout << "|" << endl;
 }
 
+void robot_movements(string& c,string acts[], Robot& r)
+{
+    fp << "inside robot_movements BEGINS" << endl;
+    c = acts[rand() % 8];
+    if (c == "a") {
+        if (r.x1 > 0) {
+            r.x1--;
+            r.x2--;
+        }
+    }
+    else if (c == "d") {
+        if (r.x2 < 19) {
+            r.x1++;
+            r.x2++;
+        }
+    }
+    else if (c == "w") {
+        if (r.y1 > 0) {
+            r.y1--;
+            r.y2--;
+        }
+    }
+    else if (c == "s") {
+        if (r.y2 < 19) {
+            r.y1++;
+            r.y2++;
+        }
+    }
+    else if (c == "f1") { // esq
+        shoots.push_back(Shoot(r.x1 - 1, r.y1, 0));
+    }
+    else if (c == "f2") { // dir
+        shoots.push_back(Shoot(r.x2 + 1, r.y1, 1));
+    }
+    else if (c == "f3") { // cima
+        shoots.push_back(Shoot(r.x1, r.y1 - 1, 2));
+    }
+    else if (c == "f4") { // baixo
+        shoots.push_back(Shoot(r.x1, r.y2 + 1, 3));
+    }
+    fp << "inside robot_movements ENDS" << endl;
+}
+
 int main()
 {
     srand(time(0));
@@ -86,6 +133,7 @@ int main()
 
     bool run = false;
 
+    fp.open("log_file.txt");
     string c;
     while (true) {
         usleep(50000);
@@ -120,47 +168,11 @@ int main()
         printscreen(robot, robot2);
 
         Robot &r = run ? robot : robot2;
+        thread th(robot_movements,ref(c),acts,ref(r));
+        fp << "outside robot_movements" << endl;
         run = !run;
-
-        c = acts[rand() % 8];
-
-        if (c == "a") {
-            if (r.x1 > 0) {
-                r.x1--;
-                r.x2--;
-            }
-        }
-        else if (c == "d") {
-            if (r.x2 < 19) {
-                r.x1++;
-                r.x2++;
-            }
-        }
-        else if (c == "w") {
-            if (r.y1 > 0) {
-                r.y1--;
-                r.y2--;
-            }
-        }
-        else if (c == "s") {
-            if (r.y2 < 19) {
-                r.y1++;
-                r.y2++;
-            }
-        }
-        else if (c == "f1") { // esq
-            shoots.push_back(Shoot(r.x1 - 1, r.y1, 0));
-        }
-        else if (c == "f2") { // dir
-            shoots.push_back(Shoot(r.x2 + 1, r.y1, 1));
-        }
-        else if (c == "f3") { // cima
-            shoots.push_back(Shoot(r.x1, r.y1 - 1, 2));
-        }
-        else if (c == "f4") { // baixo
-            shoots.push_back(Shoot(r.x1, r.y2 + 1, 3));
-        }
-
+        fp << "outside robot_movements" << endl;
+        th.join();
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
                 if (s.x > 0)
