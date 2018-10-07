@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
-#include <unistd.h>
 #include <thread>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -133,7 +133,7 @@ int main()
 
     fp.open("log_file.txt");
     while (true) {
-        usleep(50000);
+        std::this_thread::sleep_for (std::chrono::seconds(1));
 
         for (auto it = shoots.begin(); it != shoots.end(); ) {
             if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
