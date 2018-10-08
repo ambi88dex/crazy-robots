@@ -159,7 +159,7 @@ int main()
 
     fp.open("log_file.txt");
     while (true) {
-        std::this_thread::sleep_for (std::chrono::seconds(1));
+        this_thread::sleep_for(chrono::microseconds(50000));
 
         for (auto it = shoots.begin(); it != shoots.end(); ) {
             if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
