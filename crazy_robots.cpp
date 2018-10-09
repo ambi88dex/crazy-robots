@@ -2,7 +2,6 @@
 #include <vector>
 #include <cstdlib>
 #include <thread>
-#include <fstream>
 #include <chrono>
 
 using namespace std;
@@ -41,8 +40,6 @@ struct Shoot
 
 vector<Shoot> shoots;
 
-ofstream fp;
-
 bool locationIsInRobot(const Robot& robot, const int& xPosition, const int& yPosition)
 {
     return xPosition >= robot.x1 && xPosition <= robot.x2 && 
@@ -51,11 +48,10 @@ bool locationIsInRobot(const Robot& robot, const int& xPosition, const int& yPos
 
 bool isShootLocation(const int& xPosition,const int& yPosition)
 {
-    for (Shoot &shoot : shoots) {
-        if (xPosition == shoot.x && yPosition == shoot.y) {
+    for (Shoot &shoot : shoots)
+        if (xPosition == shoot.x && yPosition == shoot.y)
             return true;
-        }
-    }
+
     return false;
 }
 
@@ -67,7 +63,7 @@ void printRobotHP(const Robot& robot)
         cout << " ";
 }
 
-void printGameField()
+void printGameField(Robot &robot, Robot &robot2)
 {
     for (int yPosition = 0; yPosition < 20; yPosition++) {
         for (int xPosition = 0; xPosition < 20; xPosition++) {
@@ -75,20 +71,14 @@ void printGameField()
                 cout << "X";
             else if (locationIsInRobot(robot2,xPosition,yPosition))
                 cout << "Y";
-            else {
-                if (isShootLocation(xPosition,yPosition)) {
-                    cout << "*";
-                }
-                else {
-                    cout << "_";
-                }
-            }
+            else
+                cout << (isShootLocation(xPosition, yPosition) ? "*" : "_");
         }
         cout << "|" << endl;
     }
 }
 
-void printHPArea()
+void printHPArea(Robot &robot, Robot &robot2)
 {
     cout << "HP BOT 1: ";
     printRobotHP(robot);
@@ -102,14 +92,13 @@ void printHPArea()
 void printscreen(Robot &robot, Robot &robot2)
 {
     system("clear");
-    printGameField();
-    printHPArea();
+    printGameField(robot, robot2);
+    printHPArea(robot, robot2);
 }
 
-void robot_movements(string &c, string acts[], Robot& r)
+void robot_movements(string acts[], Robot& r)
 {
-    fp << "inside robot_movements BEGINS" << endl;
-    c = acts[rand() % 8];
+    string c = acts[rand() % 8];
     if (c == "a") {
         if (r.x1 > 0) {
             r.x1--;
@@ -146,7 +135,6 @@ void robot_movements(string &c, string acts[], Robot& r)
     else if (c == "f4") { // baixo
         shoots.push_back(Shoot(r.x1, r.y2 + 1, 3));
     }
-    fp << "inside robot_movements ENDS" << endl;
 }
 
 int main()
@@ -157,7 +145,6 @@ int main()
 
     string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
 
-    fp.open("log_file.txt");
     while (true) {
         this_thread::sleep_for(chrono::microseconds(50000));
 
@@ -187,15 +174,11 @@ int main()
             break;
         }
 
-
         printscreen(robot, robot2);
-        string c;
-        thread th(robot_movements, ref(c), acts, ref(robot));
-        thread th2(robot_movements, ref(c), acts, ref(robot2));
-        fp << "outside robot_movements" << endl;
-        fp << "outside robot_movements" << endl;
-        th.join();
-        th2.join();
+
+        robot_movements(acts, robot);
+        robot_movements(acts, robot2);
+        
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
                 if (s.x > 0)
