@@ -43,41 +43,67 @@ vector<Shoot> shoots;
 
 ofstream fp;
 
-void printscreen(Robot &robot, Robot &robot2)
+bool locationIsInRobot(const Robot& robot, const int& xPosition, const int& yPosition)
 {
-    system("clear");
-    for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < 20; j++) {
-            if (j >= robot.x1 && j <= robot.x2 && i >= robot.y1 && i <= robot.y2)
+    return xPosition >= robot.x1 && xPosition <= robot.x2 && 
+            yPosition >= robot.y1 && yPosition <= robot.y2;
+}
+
+bool isShootLocation(const int& xPosition,const int& yPosition)
+{
+    for (Shoot &shoot : shoots) {
+        if (xPosition == shoot.x && yPosition == shoot.y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void printRobotHP(const Robot& robot)
+{
+    for (int hp = 0; hp < robot.hp; hp++)
+        cout << "#";
+    for (int hits = 0; hits < (10 - robot.hp); hits++)
+        cout << " ";
+}
+
+void printGameField()
+{
+    for (int yPosition = 0; yPosition < 20; yPosition++) {
+        for (int xPosition = 0; xPosition < 20; xPosition++) {
+            if (locationIsInRobot(robot,xPosition,yPosition))
                 cout << "X";
-            else if (j >= robot2.x1 && j <= robot2.x2 && i >= robot2.y1 && i <= robot2.y2)
+            else if (locationIsInRobot(robot2,xPosition,yPosition))
                 cout << "Y";
             else {
-                bool flag = false;
-                for (Shoot &shoot : shoots) {
-                    if (j == shoot.x && i == shoot.y) {
-                        flag = true;
-                        cout << "*";
-                    }
+                if (isShootLocation(xPosition,yPosition)) {
+                    cout << "*";
                 }
-
-                if (!flag) cout << "_";
+                else {
+                    cout << "_";
+                }
             }
         }
         cout << "|" << endl;
     }
+}
+
+void printHPArea()
+{
     cout << "HP BOT 1: ";
-    for (int i = 0; i < robot.hp; i++)
-        cout << "#";
-    for (int i = 0; i < (10 - robot.hp); i++)
-        cout << " ";
+    printRobotHP(robot);
     cout << "|" << endl;
+
     cout << "HP BOT 2: ";
-    for (int i = 0; i < robot2.hp; i++)
-        cout << "#";
-    for (int i = 0; i < (10 - robot2.hp); i++)
-        cout << " ";
+    printRobotHP(robot2);
     cout << "|" << endl;
+}
+
+void printscreen(Robot &robot, Robot &robot2)
+{
+    system("clear");
+    printGameField();
+    printHPArea();
 }
 
 void robot_movements(string &c, string acts[], Robot& r)
