@@ -91,7 +91,11 @@ void printHPArea(Robot &robot, Robot &robot2)
 
 void printscreen(Robot &robot, Robot &robot2)
 {
-    system("clear");
+#ifdef _WIN32
+	system("CLS"); //clears screen for Windows OS
+#else
+	system("clear"); //clears screen for UNIX OS
+#endif
     printGameField(robot, robot2);
     printHPArea(robot, robot2);
 }
