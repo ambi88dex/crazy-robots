@@ -73,7 +73,7 @@ void printGameField()
         for (int xPosition = 0; xPosition < 20; xPosition++) {
         	bool printFlag = false;
         	for (Robot &robot : robots) {
-        		if (locationIsInRobot(robot,xPosition,yPosition)) {
+        		if (robot.hp!=0 & locationIsInRobot(robot,xPosition,yPosition)) {
         			cout << robot.name;
         			printFlag = true;
         			break;
@@ -178,14 +178,18 @@ int main(int argc, char *argv[])
 
         for (auto it = shoots.begin(); it != shoots.end(); ) {
         	for (Robot &robot : robots) {
-        		if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
-	                robot.hp--;
-	                it = shoots.erase(it);
-	                continue;
-	            }
+        		if (robot.hp != 0) {
+	        		if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
+		                robot.hp--;
+		                it = shoots.erase(it);
+		                continue;
+		            }
+	        	}
         	}
             ++it;
         }
+
+        printscreen();
 
         //check winning condition: last survivor
         int totalHP = 0;
@@ -198,10 +202,9 @@ int main(int argc, char *argv[])
             }
         }
 
-        printscreen();
-
 		for (Robot &robot : robots)
-        	robot_movements(acts, robot);
+			if (robot.hp != 0)
+        		robot_movements(acts, robot);
         
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
