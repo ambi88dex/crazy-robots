@@ -8,13 +8,15 @@ using namespace std;
 
 struct Robot 
 {
+	char name;
     int hp;
     int x1;
     int y1;
     int x2;
     int y2;
 
-    Robot(int hp, int x1, int y1, int x2, int y2) :
+    Robot(char name, int hp, int x1, int y1, int x2, int y2) :
+    	name(name),
         hp(hp),
         x1(x1),
         y1(y1),
@@ -38,6 +40,8 @@ struct Shoot
     }
 };
 
+int numberOfRobots;
+vector<Robot> robots;
 vector<Shoot> shoots;
 
 bool locationIsInRobot(const Robot& robot, const int& xPosition, const int& yPosition)
@@ -63,41 +67,43 @@ void printRobotHP(const Robot& robot)
         cout << " ";
 }
 
-void printGameField(Robot &robot, Robot &robot2)
+void printGameField()
 {
     for (int yPosition = 0; yPosition < 20; yPosition++) {
         for (int xPosition = 0; xPosition < 20; xPosition++) {
-            if (locationIsInRobot(robot,xPosition,yPosition))
-                cout << "X";
-            else if (locationIsInRobot(robot2,xPosition,yPosition))
-                cout << "Y";
-            else
-                cout << (isShootLocation(xPosition, yPosition) ? "*" : "_");
+        	bool printFlag = false;
+        	for (Robot &robot : robots) {
+        		if (locationIsInRobot(robot,xPosition,yPosition)) {
+        			cout << robot.name;
+        			printFlag = true;
+        			break;
+        		}
+        	}
+        	if (!printFlag)
+        		cout << (isShootLocation(xPosition, yPosition) ? "*" : "_");
         }
         cout << "|" << endl;
     }
 }
 
-void printHPArea(Robot &robot, Robot &robot2)
+void printHPArea()
 {
-    cout << "HP BOT 1: ";
-    printRobotHP(robot);
-    cout << "|" << endl;
-
-    cout << "HP BOT 2: ";
-    printRobotHP(robot2);
-    cout << "|" << endl;
+    for (Robot &robot : robots) {
+    	cout << "HP BOT " << robot.name << ": ";
+		printRobotHP(robot);
+		cout << "|" << endl;
+    }    	
 }
 
-void printscreen(Robot &robot, Robot &robot2)
+void printscreen()
 {
 #ifdef _WIN32
 	system("CLS"); //clears screen for Windows OS
 #else
 	system("clear"); //clears screen for UNIX OS
 #endif
-    printGameField(robot, robot2);
-    printHPArea(robot, robot2);
+    printGameField();
+    printHPArea();
 }
 
 void robot_movements(string acts[], Robot& r)
@@ -141,11 +147,29 @@ void robot_movements(string acts[], Robot& r)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	if (argc == 2) {
+		numberOfRobots = atoi(argv[1]);
+		if (numberOfRobots < 1 || numberOfRobots > 4) {
+			cout << "1 <= Number of robots <= 4\n";
+			return 1;
+		}
+	} else {
+		cout << "One argument expected: number of robots.\n";
+		return 1;
+	}
+
     srand(time(0));
-    Robot robot(10, 0, 0, 1, 1);
-    Robot robot2(10, 18, 18, 19, 19);
+
+    if (numberOfRobots >= 1)
+    	robots.push_back(Robot('X',10, 0, 0, 1, 1));
+    if (numberOfRobots >= 2)
+    	robots.push_back(Robot('Y',10, 18, 18, 19, 19));
+    if (numberOfRobots >= 3)
+    	robots.push_back(Robot('A',10, 0, 18, 1, 19));
+    if (numberOfRobots >= 4)
+    	robots.push_back(Robot('B',10, 18, 0, 19, 1));
 
     string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
 
@@ -153,35 +177,31 @@ int main()
         this_thread::sleep_for(chrono::microseconds(50000));
 
         for (auto it = shoots.begin(); it != shoots.end(); ) {
-            if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
-                robot.hp--;
-                it = shoots.erase(it);
-                continue;
-            }
-
-            if ((robot2.x1 <= (*it).x && (*it).x <= robot2.x2) && (robot2.y1 <= (*it).y && (*it).y <= robot2.y2)) {
-                robot2.hp--;
-                it = shoots.erase(it);
-                continue;
-            }
-
+        	for (Robot &robot : robots) {
+        		if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
+	                robot.hp--;
+	                it = shoots.erase(it);
+	                continue;
+	            }
+        	}
             ++it;
         }
 
-        if (robot.hp == 0) {
-            cout << "ROBOT 2 WINS!!!" << endl;
-            break;
+        //check winning condition: last survivor
+        int totalHP = 0;
+        for (Robot &robot : robots)
+        	totalHP += robot.hp;
+        for (Robot &robot : robots) {
+        	if (robot.hp == totalHP) {
+        		cout << "ROBOT "<< robot.name <<" WINS!!!" << endl;
+            	return 0;
+            }
         }
 
-        if (robot2.hp == 0) {
-            cout << "ROBOT 1 WINS!!!" << endl;
-            break;
-        }
+        printscreen();
 
-        printscreen(robot, robot2);
-
-        robot_movements(acts, robot);
-        robot_movements(acts, robot2);
+		for (Robot &robot : robots)
+        	robot_movements(acts, robot);
         
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
