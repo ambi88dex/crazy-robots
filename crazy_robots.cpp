@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 
 using namespace std;
 
@@ -73,7 +74,7 @@ void printGameField()
         for (int xPosition = 0; xPosition < 20; xPosition++) {
         	bool printFlag = false;
         	for (Robot &robot : robots) {
-        		if (robot.hp!=0 && locationIsInRobot(robot,xPosition,yPosition)) {
+        		if (locationIsInRobot(robot,xPosition,yPosition)) {
         			cout << robot.name;
         			printFlag = true;
         			break;
@@ -147,6 +148,12 @@ void robot_movements(string acts[], Robot& r)
     }
 }
 
+void removeDeadRobots() {
+    robots.erase(remove_if(robots.begin(), 
+                              robots.end(),
+                              [](Robot& x){return x.hp < 1;}),robots.end());
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc == 2) {
@@ -178,32 +185,25 @@ int main(int argc, char *argv[])
 
         for (auto it = shoots.begin(); it != shoots.end(); ) {
         	for (Robot &robot : robots) {
-        		if (robot.hp != 0) {
-                    if (locationIsInRobot(robot,(*it).x,(*it).y)) {
+                if (locationIsInRobot(robot,(*it).x,(*it).y)) {
 		                robot.hp--;
 		                it = shoots.erase(it);
 		                continue;
 		            }
-	        	}
         	}
             ++it;
         }
 
+        removeDeadRobots();
         printscreen();
 
         //check winning condition: last survivor
-        int totalHP = 0;
-        for (Robot &robot : robots)
-        	totalHP += robot.hp;
-        for (Robot &robot : robots) {
-        	if (robot.hp == totalHP) {
-        		cout << "ROBOT "<< robot.name <<" WINS!!!" << endl;
-            	return 0;
-            }
+        if (robots.size() == 1) {
+            cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
+            return 0;
         }
 
 		for (Robot &robot : robots)
-			if (robot.hp != 0)
         		robot_movements(acts, robot);
         
         for (Shoot &s : shoots) {
