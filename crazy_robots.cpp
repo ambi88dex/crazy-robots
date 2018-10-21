@@ -73,7 +73,7 @@ void printGameField()
         for (int xPosition = 0; xPosition < 20; xPosition++) {
         	bool printFlag = false;
         	for (Robot &robot : robots) {
-        		if (robot.hp!=0 & locationIsInRobot(robot,xPosition,yPosition)) {
+        		if (robot.hp!=0 && locationIsInRobot(robot,xPosition,yPosition)) {
         			cout << robot.name;
         			printFlag = true;
         			break;
