@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
         for (auto it = shoots.begin(); it != shoots.end(); ) {
         	for (Robot &robot : robots) {
         		if (robot.hp != 0) {
-	        		if ((robot.x1 <= (*it).x && (*it).x <= robot.x2) && (robot.y1 <= (*it).y && (*it).y <= robot.y2)) {
+                    if (locationIsInRobot(robot,(*it).x,(*it).y)) {
 		                robot.hp--;
 		                it = shoots.erase(it);
 		                continue;
