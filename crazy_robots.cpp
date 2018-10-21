@@ -154,6 +154,83 @@ void removeDeadRobots() {
                               [](Robot& x){return x.hp < 1;}),robots.end());
 }
 
+void handleHits() {
+    for (auto it = shoots.begin(); it != shoots.end(); ) {
+        	for (Robot &robot : robots) {
+                if (locationIsInRobot(robot,(*it).x,(*it).y)) {
+		                robot.hp--;
+		                it = shoots.erase(it);
+		                continue;
+		            }
+        	}
+            ++it;
+        }
+}
+
+bool thereIsOneLastSurvivor(){
+    //check winning condition: last survivor
+    if (robots.size() == 1) {
+        cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
+        return true;
+    }
+
+    return false;
+}
+
+void doRobotMovement() {
+    static string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
+
+    for (Robot &robot : robots) {
+        robot_movements(acts, robot);
+    }
+}
+
+void doShootMovement() {
+    
+    for (Shoot &s : shoots) {
+        if (s.dir == 0) {
+            if (s.x > 0)
+                s.x--;
+            else {
+                s.x = -1;
+                s.y = -1;
+            }
+        }
+        else if (s.dir == 1) {
+            if (s.x < 19)
+                s.x++;
+            else {
+                s.x = -1;
+                s.y = -1;
+            }
+        }
+        else if (s.dir == 2) {
+            if (s.y > 0)
+                s.y--;
+            else {
+                s.x = -1;
+                s.y = -1;
+            }
+        }
+        else if (s.dir == 3) {
+            if (s.y < 19)
+                s.y++;
+            else {
+                s.x = -1;
+                s.y = -1;
+            }
+        }
+    }
+
+    vector<Shoot> tmp;
+    for (Shoot &s : shoots)
+        if (s.x != -1 && s.y != -1)
+            tmp.push_back(s);
+    shoots.clear();
+    for (Shoot &s : tmp)
+        shoots.push_back(s);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc == 2) {
@@ -178,76 +255,21 @@ int main(int argc, char *argv[])
     if (numberOfRobots >= 4)
     	robots.push_back(Robot('B',10, 18, 0, 19, 1));
 
-    string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
-
     while (true) {
         this_thread::sleep_for(chrono::microseconds(50000));
 
-        for (auto it = shoots.begin(); it != shoots.end(); ) {
-        	for (Robot &robot : robots) {
-                if (locationIsInRobot(robot,(*it).x,(*it).y)) {
-		                robot.hp--;
-		                it = shoots.erase(it);
-		                continue;
-		            }
-        	}
-            ++it;
-        }
-
+        handleHits();
         removeDeadRobots();
-        printscreen();
-
-        //check winning condition: last survivor
-        if (robots.size() == 1) {
-            cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
+        
+        if(thereIsOneLastSurvivor()){
             return 0;
         }
 
-		for (Robot &robot : robots)
-        		robot_movements(acts, robot);
+        printscreen();
+		doRobotMovement();
+        doShootMovement();
         
-        for (Shoot &s : shoots) {
-            if (s.dir == 0) {
-                if (s.x > 0)
-                    s.x--;
-                else {
-                    s.x = -1;
-                    s.y = -1;
-                }
-            }
-            else if (s.dir == 1) {
-                if (s.x < 19)
-                    s.x++;
-                else {
-                    s.x = -1;
-                    s.y = -1;
-                }
-            }
-            else if (s.dir == 2) {
-                if (s.y > 0)
-                    s.y--;
-                else {
-                    s.x = -1;
-                    s.y = -1;
-                }
-            }
-            else if (s.dir == 3) {
-                if (s.y < 19)
-                    s.y++;
-                else {
-                    s.x = -1;
-                    s.y = -1;
-                }
-            }
-        }
 
-        vector<Shoot> tmp;
-        for (Shoot &s : shoots)
-            if (s.x != -1 && s.y != -1)
-                tmp.push_back(s);
-        shoots.clear();
-        for (Shoot &s : tmp)
-            shoots.push_back(s);
     }
     
     return 0;
