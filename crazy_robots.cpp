@@ -147,6 +147,35 @@ void robot_movements(string acts[], Robot& r)
     }
 }
 
+//check if robot is colliding with another, if so remove 1 health from each robot
+void checkCrash() {
+	//crashFlags handles when multiple robots crash at once 
+	int crashFlags[] = { 0,0,0,0 };
+	int counter = 0; //flag counter for parent loop
+	int next = 0; //flag counter for child loop and other robot
+
+	for (auto it = robots.begin();it<robots.end();it++){
+		if ((*it).hp > 0)
+			for (auto inIt = it; inIt < robots.end(); inIt++) {
+				if ((*inIt).hp > 0)
+					if (inIt != it && (locationIsInRobot((*inIt),(*it).x1, (*it).y1) || locationIsInRobot((*inIt), (*it).x1, (*it).y2)
+						|| locationIsInRobot((*inIt), (*it).x2, (*it).y1) || locationIsInRobot((*inIt), (*it).x2, (*it).y2))){ 
+						if (crashFlags[counter]!=1){
+							(*it).hp--; //remove health from Robot closer to the front of vector 
+							crashFlags[counter] = 1;
+						}
+						if (crashFlags[counter + next] != 1){
+							(*inIt).hp--; //remove the health from Robot it crashed into
+							crashFlags[counter + next] = 1;
+						}
+					}
+				next++;
+			}
+		next = 0; 
+		counter++;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc == 2) {
@@ -206,6 +235,8 @@ int main(int argc, char *argv[])
 			if (robot.hp != 0)
         		robot_movements(acts, robot);
         
+		checkCrash();
+		
         for (Shoot &s : shoots) {
             if (s.dir == 0) {
                 if (s.x > 0)
