@@ -236,6 +236,7 @@ void doShootMovement() {
         shoots.push_back(s);
 }
 
+
 void checkCrash() {
 	//crashFlags handles when multiple robots crash at once 
 	int crashFlags[] = { 0,0,0,0 };
@@ -261,6 +262,7 @@ void checkCrash() {
 		counter++;
 	}
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -301,6 +303,7 @@ int main(int argc, char *argv[])
 		doRobotMovement();
         doShootMovement();
         checkCrash();
+
 
     }
     
