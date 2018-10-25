@@ -173,6 +173,11 @@ bool thereIsOneLastSurvivor(){
         cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
         return true;
     }
+	else if (robots.size() == 0) {
+		cout << "ALL ROBOTS HAVE BEEN DESTROYED. IT'S A DRAW" << endl;
+		return true;
+	}
+
 
     return false;
 }
@@ -287,11 +292,12 @@ int main(int argc, char *argv[])
         handleHits();
         removeDeadRobots();
         
+
+		printscreen();
         if(thereIsOneLastSurvivor()){
             return 0;
         }
 
-        printscreen();
 		doRobotMovement();
         doShootMovement();
         checkCrash();
