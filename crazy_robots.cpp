@@ -261,11 +261,11 @@ int main(int argc, char *argv[])
         handleHits();
         removeDeadRobots();
         
+		printscreen();
         if(thereIsOneLastSurvivor()){
             return 0;
         }
 
-        printscreen();
 		doRobotMovement();
         doShootMovement();
         
