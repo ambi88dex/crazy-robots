@@ -170,11 +170,11 @@ void handleHits() {
 
 bool thereIsOneLastSurvivor(){
     //check winning condition: last survivor
-    if (robots.size() == 1) {
+    if (robotsRemaining == 1) {
         cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
         return true;
     }
-	else if (robots.size() == 0) {
+	else if (robotsRemaining == 0) {
 		cout << "ALL ROBOTS HAVE BEEN DESTROYED. IT'S A DRAW" << endl;
 		return true;
 	}
