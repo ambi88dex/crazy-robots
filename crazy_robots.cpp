@@ -42,7 +42,6 @@ struct Shoot
 };
 
 int numberOfRobots;
-int robotsRemaining;
 vector<Robot> robots;
 vector<Shoot> shoots;
 
@@ -170,11 +169,11 @@ void handleHits() {
 
 bool thereIsOneLastSurvivor(){
     //check winning condition: last survivor
-    if (robotsRemaining == 1) {
+    if (robots.size() == 1) {
         cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
         return true;
     }
-	else if (robotsRemaining == 0) {
+	else if (robots.size() == 0) {
 		cout << "ALL ROBOTS HAVE BEEN DESTROYED. IT'S A DRAW" << endl;
 		return true;
 	}
@@ -269,7 +268,6 @@ int main(int argc, char *argv[])
 {
 	if (argc == 2) {
 		numberOfRobots = atoi(argv[1]);
-		robotsRemaining = numberOfRobots;
 		if (numberOfRobots < 1 || numberOfRobots > 4) {
 			cout << "1 <= Number of robots <= 4\n";
 			return 1;
