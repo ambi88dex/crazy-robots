@@ -42,6 +42,7 @@ struct Shoot
 };
 
 int numberOfRobots;
+int robotsRemaining;
 vector<Robot> robots;
 vector<Shoot> shoots;
 
@@ -151,7 +152,7 @@ void robot_movements(string acts[], Robot& r)
 void removeDeadRobots() {
     robots.erase(remove_if(robots.begin(), 
                               robots.end(),
-                              [](Robot& x){return x.hp < 1;}),robots.end());
+		[](Robot& x) {robotsRemaining--; return x.hp < 1; }), robots.end());
 }
 
 void handleHits() {
@@ -268,6 +269,7 @@ int main(int argc, char *argv[])
 {
 	if (argc == 2) {
 		numberOfRobots = atoi(argv[1]);
+		robotsRemaining = numberOfRobots;
 		if (numberOfRobots < 1 || numberOfRobots > 4) {
 			cout << "1 <= Number of robots <= 4\n";
 			return 1;
