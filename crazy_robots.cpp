@@ -41,7 +41,6 @@ struct Shoot
     }
 };
 
-int numberOfRobots;
 vector<Robot> robots;
 vector<Shoot> shoots;
 
@@ -266,13 +265,15 @@ void checkCrash() {
 
 int main(int argc, char *argv[])
 {
+	int numberOfRobots;
 	if (argc == 2) {
 		numberOfRobots = atoi(argv[1]);
 		if (numberOfRobots < 1 || numberOfRobots > 4) {
 			cout << "1 <= Number of robots <= 4\n";
 			return 1;
 		}
-	} else {
+	}
+	else{
 		cout << "One argument expected: number of robots.\n";
 		return 1;
 	}
@@ -294,7 +295,6 @@ int main(int argc, char *argv[])
         handleHits();
         removeDeadRobots();
         
-
 		printscreen();
         if(thereIsOneLastSurvivor()){
             return 0;
@@ -304,8 +304,6 @@ int main(int argc, char *argv[])
         doShootMovement();
         checkCrash();
 
-
     }
-    
     return 0;
 }
