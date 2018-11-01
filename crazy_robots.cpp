@@ -151,7 +151,7 @@ void robot_movements(string acts[], Robot& r)
 void removeDeadRobots() {
     robots.erase(remove_if(robots.begin(), 
                               robots.end(),
-		[](Robot& x) {robotsRemaining--; return x.hp < 1; }), robots.end());
+		[](Robot& x) {return x.hp < 1; }), robots.end());
 }
 
 void handleHits() {
