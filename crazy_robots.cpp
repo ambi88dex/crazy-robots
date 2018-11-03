@@ -133,18 +133,14 @@ void robot_movements(string acts[], Robot& r)
             r.y2++;
         }
     }
-    else if (c == "f1") { // esq
+    else if (c == "f1")// left
         shoots.push_back(Shoot(r.x1 - 1, r.y1, 0));
-    }
-    else if (c == "f2") { // dir
+    else if (c == "f2") // right
         shoots.push_back(Shoot(r.x2 + 1, r.y1, 1));
-    }
-    else if (c == "f3") { // cima
+    else if (c == "f3") // up
         shoots.push_back(Shoot(r.x1, r.y1 - 1, 2));
-    }
-    else if (c == "f4") { // baixo
+    else if (c == "f4") // down
         shoots.push_back(Shoot(r.x1, r.y2 + 1, 3));
-    }
 }
 
 void removeDeadRobots() {
@@ -266,24 +262,24 @@ void checkCrash() {
 int main(int argc, char *argv[])
 {
 	int numberOfRobots;
-	if (argc == 2) {
-		numberOfRobots = atoi(argv[1]);
-		if (numberOfRobots < 1 || numberOfRobots > 4) {
-			cout << "1 <= Number of robots <= 4\n";
-			return 1;
-		}
-	}
-	else{
-		cout << "One argument expected: number of robots.\n";
-		return 1;
-	}
+    if (argc == 2) {
+        numberOfRobots = atoi(argv[1]);
+        if (numberOfRobots < 2 || numberOfRobots > 4) {
+            cout << "2 <= Number of robots <= 4\n";
+            return 1;
+        }
+    }
+    else {
+        cout << "One argument expected: number of robots.\n";
+        return 1;
+    }
 
     srand(time(0));
 
-    if (numberOfRobots >= 1)
+    if (numberOfRobots >= 2) {
     	robots.push_back(Robot('X',10, 0, 0, 1, 1));
-    if (numberOfRobots >= 2)
     	robots.push_back(Robot('Y',10, 18, 18, 19, 19));
+    }
     if (numberOfRobots >= 3)
     	robots.push_back(Robot('A',10, 0, 18, 1, 19));
     if (numberOfRobots >= 4)
@@ -296,11 +292,11 @@ int main(int argc, char *argv[])
         removeDeadRobots();
         
 		printscreen();
-        if(thereIsOneLastSurvivor()){
-            return 0;
-        }
 
-		doRobotMovement();
+        if(thereIsOneLastSurvivor())
+            return 0;
+
+        doRobotMovement();
         doShootMovement();
         checkCrash();
 
