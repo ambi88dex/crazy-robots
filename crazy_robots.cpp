@@ -255,7 +255,7 @@ void checkCrash() {
 
 int main(int argc, char *argv[])
 {
-	int numberOfRobots;
+    int numberOfRobots;
     if (argc == 2) {
         numberOfRobots = atoi(argv[1]);
         if (numberOfRobots < 2 || numberOfRobots > 4) {
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
         handleHits();
         removeDeadRobots();
         
-		printscreen();
+        printscreen();
 
         if(thereIsOneLastSurvivor())
             return 0;
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
         doRobotMovement();
         doShootMovement();
         checkCrash();
-
     }
+
     return 0;
 }
