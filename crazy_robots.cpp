@@ -46,8 +46,7 @@ vector<Shoot> shoots;
 
 bool locationIsInRobot(const Robot& robot, const int& xPosition, const int& yPosition)
 {
-    return xPosition >= robot.x1 && xPosition <= robot.x2 && 
-            yPosition >= robot.y1 && yPosition <= robot.y2;
+    return xPosition >= robot.x1 && xPosition <= robot.x2 && yPosition >= robot.y1 && yPosition <= robot.y2;
 }
 
 bool isShootLocation(const int& xPosition,const int& yPosition)
@@ -98,9 +97,9 @@ void printHPArea()
 void printscreen()
 {
 #ifdef _WIN32
-	system("CLS"); //clears screen for Windows OS
+    system("CLS"); //clears screen for Windows OS
 #else
-	system("clear"); //clears screen for UNIX OS
+    system("clear"); //clears screen for UNIX OS
 #endif
     printGameField();
     printHPArea();
@@ -144,22 +143,20 @@ void robot_movements(string acts[], Robot& r)
 }
 
 void removeDeadRobots() {
-    robots.erase(remove_if(robots.begin(), 
-                              robots.end(),
-		[](Robot& x) {return x.hp < 1; }), robots.end());
+    robots.erase(remove_if(robots.begin(), robots.end(), [](Robot& x) {return x.hp < 1; }), robots.end());
 }
 
 void handleHits() {
     for (auto it = shoots.begin(); it != shoots.end(); ) {
-        	for (Robot &robot : robots) {
-                if (locationIsInRobot(robot,(*it).x,(*it).y)) {
-		                robot.hp--;
-		                it = shoots.erase(it);
-		                continue;
-		            }
-        	}
-            ++it;
+        for (Robot &robot : robots) {
+            if (locationIsInRobot(robot,(*it).x,(*it).y)) {
+                robot.hp--;
+                it = shoots.erase(it);
+                continue;
+            }
         }
+        ++it;
+    }
 }
 
 bool thereIsOneLastSurvivor(){
@@ -168,11 +165,10 @@ bool thereIsOneLastSurvivor(){
         cout << "ROBOT "<< robots[0].name <<" WINS!!!" << endl;
         return true;
     }
-	else if (robots.size() == 0) {
-		cout << "ALL ROBOTS HAVE BEEN DESTROYED. IT'S A DRAW" << endl;
-		return true;
-	}
-
+    else if (robots.size() == 0) {
+        cout << "ALL ROBOTS HAVE BEEN DESTROYED. IT'S A DRAW" << endl;
+        return true;
+    }
 
     return false;
 }
@@ -180,9 +176,8 @@ bool thereIsOneLastSurvivor(){
 void doRobotMovement() {
     static string acts[] = {"a", "d", "w", "s", "f1", "f2", "f3", "f4"};
 
-    for (Robot &robot : robots) {
+    for (Robot &robot : robots)
         robot_movements(acts, robot);
-    }
 }
 
 void doShootMovement() {
@@ -231,33 +226,32 @@ void doShootMovement() {
         shoots.push_back(s);
 }
 
-
 void checkCrash() {
 	//crashFlags handles when multiple robots crash at once 
 	int crashFlags[] = { 0,0,0,0 };
 	int counter = 0; //flag counter for parent loop
 	int next = 0; //flag counter for child loop and other robot
 
-	for (auto it = robots.begin();it<robots.end();it++){
-			for (auto inIt = it; inIt < robots.end(); inIt++) {
-					if (inIt != it && (locationIsInRobot((*inIt),(*it).x1, (*it).y1) || locationIsInRobot((*inIt), (*it).x1, (*it).y2)
-						|| locationIsInRobot((*inIt), (*it).x2, (*it).y1) || locationIsInRobot((*inIt), (*it).x2, (*it).y2))){ 
-						if (crashFlags[counter]!=1){
-							(*it).hp--; //remove health from Robot closer to the front of vector 
-							crashFlags[counter] = 1;
-						}
-						if (crashFlags[counter + next] != 1){
-							(*inIt).hp--; //remove the health from Robot it crashed into
-							crashFlags[counter + next] = 1;
-						}
-					}
-				next++;
-			}
-		next = 0; 
-		counter++;
-	}
-}
+    for (auto it = robots.begin();it<robots.end();it++){
+        for (auto inIt = it; inIt < robots.end(); inIt++) {
+            if (inIt != it && (locationIsInRobot((*inIt),(*it).x1, (*it).y1) || locationIsInRobot((*inIt), (*it).x1, (*it).y2)
+                        || locationIsInRobot((*inIt), (*it).x2, (*it).y1) || locationIsInRobot((*inIt), (*it).x2, (*it).y2))){
+                if (crashFlags[counter]!=1){
+                    (*it).hp--; //remove health from Robot closer to the front of vector
+                    crashFlags[counter] = 1;
+                }
 
+                if (crashFlags[counter + next] != 1){
+                    (*inIt).hp--; //remove the health from Robot it crashed into
+                    crashFlags[counter + next] = 1;
+                }
+            }
+            next++;
+        }
+        next = 0;
+        counter++;
+    }
+}
 
 int main(int argc, char *argv[])
 {
