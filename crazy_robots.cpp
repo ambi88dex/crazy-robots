@@ -88,10 +88,10 @@ void printGameField()
 void printHPArea()
 {
     for (Robot &robot : robots) {
-    	cout << "HP BOT " << robot.name << ": ";
-		printRobotHP(robot);
-		cout << "|" << endl;
-    }    	
+        cout << "HP BOT " << robot.name << ": ";
+        printRobotHP(robot);
+        cout << "|" << endl;
+    }
 }
 
 void printscreen()
