@@ -226,23 +226,29 @@ void doShootMovement() {
         shoots.push_back(s);
 }
 
+bool robotCrash(const Robot& firstRobot, const Robot& secondRobot) {
+    return locationIsInRobot(secondRobot,firstRobot.x1, firstRobot.y1) || 
+            locationIsInRobot(secondRobot, firstRobot.x1, firstRobot.y2) || 
+            locationIsInRobot(secondRobot, firstRobot.x2, firstRobot.y1) || 
+            locationIsInRobot(secondRobot, firstRobot.x2, firstRobot.y2);
+}
+
 void checkCrash() {
 	//crashFlags handles when multiple robots crash at once 
 	int crashFlags[] = { 0,0,0,0 };
 	int counter = 0; //flag counter for parent loop
 	int next = 0; //flag counter for child loop and other robot
 
-    for (auto it = robots.begin();it<robots.end();it++){
-        for (auto inIt = it; inIt < robots.end(); inIt++) {
-            if (inIt != it && (locationIsInRobot((*inIt),(*it).x1, (*it).y1) || locationIsInRobot((*inIt), (*it).x1, (*it).y2)
-                        || locationIsInRobot((*inIt), (*it).x2, (*it).y1) || locationIsInRobot((*inIt), (*it).x2, (*it).y2))){
+    for (auto firstRobot = robots.begin(); firstRobot != robots.end(); firstRobot++){
+        for (auto secondRobot = firstRobot; secondRobot != robots.end(); secondRobot++) {
+            if (secondRobot != firstRobot && robotCrash((*firstRobot),(*secondRobot))){
                 if (crashFlags[counter]!=1){
-                    (*it).hp--; //remove health from Robot closer to the front of vector
+                    (*firstRobot).hp--; //remove health from Robot closer to the front of vector
                     crashFlags[counter] = 1;
                 }
 
                 if (crashFlags[counter + next] != 1){
-                    (*inIt).hp--; //remove the health from Robot it crashed into
+                    (*secondRobot).hp--; //remove the health from Robot it crashed into
                     crashFlags[counter + next] = 1;
                 }
             }
